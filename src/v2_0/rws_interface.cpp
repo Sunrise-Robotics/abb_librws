@@ -37,6 +37,7 @@
 #include <abb_librws/v2_0/rw/rapid.h>
 #include <abb_librws/v2_0/rw/ctrl.h>
 #include <abb_librws/v2_0/rws.h>
+#include <abb_librws/v2_0/rw/panel.h>
 #include <abb_librws/rws_rapid.h>
 #include <abb_librws/parsing.h>
 
@@ -807,7 +808,29 @@ void RWSInterface::registerRemoteUser(const std::string& username,
 {
   rws_client_.registerRemoteUser(username, application, location);
 }
+// #########################################################
+// TIMO TIMO TIMO
+// #########################################################
+bool RWSInterface::isAutoMode()
+{
+  return rw::panel::getOperationMode(rws_client_) == rw::OperationMode::automatic;
+}
 
+bool RWSInterface::isMotorsOn()
+{
+  return rw::panel::getControllerState(rws_client_) == rw::ControllerState::motorOn;
+}
+
+void RWSInterface::setMotorsOn()
+{
+  rw::panel::setControllerState(rws_client_, rw::ControllerState::motorOn);
+}
+
+void RWSInterface::setMotorsOff()
+{
+  rw::panel::setControllerState(rws_client_, rw::ControllerState::motorOff);
+}
+// #########################################################
 
 void RWSInterface::setDigitalSignal(std::string const& signal_name, bool value)
 {

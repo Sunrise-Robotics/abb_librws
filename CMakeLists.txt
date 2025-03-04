@@ -88,11 +88,11 @@ add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 include(GenerateExportHeader)
 generate_export_header(${PROJECT_NAME}
-  EXPORT_FILE_NAME ${PROJECT_NAME}/${PROJECT_NAME}_export.h
+  EXPORT_FILE_NAME export/abb_librws/abb_librws_export.h
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
-  "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include;${CMAKE_CURRENT_BINARY_DIR}>"
+  "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include;${CMAKE_CURRENT_BINARY_DIR}/export>"
   $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>
   ${Poco_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
@@ -110,6 +110,13 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC "BOOST_LOG_DYN_LINK")
 if(NOT BUILD_SHARED_LIBS)
   target_compile_definitions(${PROJECT_NAME} PUBLIC "ABB_LIBRWS_STATIC_DEFINE")
 endif()
+
+add_executable(rws_test src/main.cpp)
+target_link_libraries(rws_test PRIVATE ${PROJECT_NAME})
+target_include_directories(rws_test PRIVATE
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
+  ${CMAKE_CURRENT_BINARY_DIR}/export
+)
 
 ##########
 ## Test ##
@@ -147,8 +154,8 @@ install(
 
 install(
   FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}_export.h
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
+    ${CMAKE_CURRENT_BINARY_DIR}/export/abb_librws/abb_librws_export.h
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/abb_librws
 )
 
 install(

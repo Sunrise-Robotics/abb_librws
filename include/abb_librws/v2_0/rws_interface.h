@@ -240,6 +240,43 @@ public:
    */
   SystemInfo getSystemInfo();
 
+  bool isAutoMode();
+
+  /**
+   * \brief A method for checking if the motors are on.
+   *
+   * \return if the motors are on or not.
+   *
+   * \throw \a std::runtime_error if something goes wrong.
+   */
+  bool isMotorsOn();
+
+  /**
+   * \brief A method for checking if RAPID is running.
+   *
+   * \return if RAPID is running or not.
+   *
+   * \throw \a std::runtime_error if something goes wrong.
+   */
+  void setMotorsOn();
+
+  /**
+   * \brief A method for turning off the robot controller's motors.
+   *
+   * \throw \a std::runtime_error if something goes wrong.
+   */
+  void setMotorsOff();
+
+  /**
+   * \brief A method for setting the robot controller's speed ratio for RAPID motions (e.g. MoveJ and MoveL).
+   *
+   * Note: The ratio must be an integer in the range [0, 100] (ie: inclusive).
+   *
+   * \param ratio specifying the new ratio.
+   *
+   * \throw \a std::runtime_error if something goes wrong.
+   */
+
   /// @brief Set value of a digital signal
   ///
   /// @param signal_name Name of the signal
