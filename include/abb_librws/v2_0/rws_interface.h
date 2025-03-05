@@ -232,6 +232,33 @@ public:
                                   const std::string& wobj = "");
 
   /**
+   * \brief A method for retrieving the data of a RAPID symbol in raw text format.
+   *
+   * See the corresponding "setRAPIDSymbolData(...)" method for examples of RAPID symbols in raw text format.
+   *
+   * \param task name of the RAPID task containing the RAPID symbol.
+   * \param module name of the RAPID module containing the RAPID symbol.
+   * \param name name of the RAPID symbol.
+   *
+   * \return std::string containing the data. Empty if not found.
+   *
+   * \throw \a std::runtime_error if something goes wrong.
+   */
+  std::string getRAPIDSymbolData(const std::string& task, const std::string& module, const std::string& name);
+
+
+  /**
+   * \brief Retrieves the data of a RAPID symbol (parsed into a struct representing the RAPID data).
+   *
+   * \param resource specifies the RAPID task, module and symbol name.
+   * \param data for storing the retrieved RAPID symbol data.
+   *
+   * \throw \a std::runtime_error if something goes wrong.
+   */
+  void getRAPIDSymbolData(RAPIDResource const& resource, RAPIDSymbolDataAbstract& data);
+
+
+  /**
    * \brief A method for retrieving some system information from the robot controller.
    *
    * \return SystemInfo containing the system information (info will be empty if e.g. a timeout occurred).
@@ -250,6 +277,36 @@ public:
    * \throw \a std::runtime_error if something goes wrong.
    */
   bool isMotorsOn();
+
+  /**
+   * \brief A method for starting RAPID execution in the robot controller.
+   *
+   * There can be a delay between the function returns and when the RAPID program enters the "running" state.
+   *
+   * \throw \a std::runtime_error if something goes wrong.
+   */
+  void startRAPIDExecution();
+
+  /**
+   * \brief A method for stopping RAPID execution in the robot controller.
+   *
+   * https://developercenter.robotstudio.com/api/rwsApi/rapid_execution_stop_page.html
+   *
+   * There can be a delay between the function returns and when the RAPID program enters the "stopped" state.
+   *
+   * \param stopmode stop mode
+   * \param usetsp which tasks to stop (?)
+   *
+   * \throw \a std::runtime_error if something goes wrong.
+   */
+  void stopRAPIDExecution(StopMode stopmode = StopMode::stop, UseTsp usetsp = UseTsp::normal);
+
+  /**
+   * \brief A method for reseting the RAPID program pointer in the robot controller.
+   *
+   * \throw \a std::runtime_error if something goes wrong.
+   */
+  void resetRAPIDProgramPointer();
 
   /**
    * \brief A method for checking if RAPID is running.
@@ -299,6 +356,50 @@ public:
   /// @param value New value of the signal
   ///
   void setGroupSignal(std::string const& signal_name, std::uint32_t value);
+
+
+  /**
+   * \brief A method for setting the data of a RAPID symbol via raw text format.
+   *
+   * Examples of RAPID symbols in raw text format:
+   * - num: "1" or "-2.5".
+   * - bool: "TRUE" or "FALSE".
+   * - pos: "[1, -2, 3.3]".
+   * - jointtarget: "[[1, -2, 3.3, -4.4, 5, 6], [9E9, 9E9, 9E9, 9E9, 9E9, 9E9]]"
+   *
+   * Notes:
+   * - The absence of square brackets implies the symbol is of atomic data type.
+   * - Record data types (composed of subcomponents) are always enclosed in square brackets.
+   * - The value '9E9', in the jointtarget record, mean that the joint is not in use.
+   *
+   * Please see the "Technical reference manual - RAPID overview"
+   * (document ID: 3HAC050947-001, revision: K) for more information
+   * about basic RAPID data types and programming.
+   *
+   * \param task name of the RAPID task containing the RAPID symbol.
+   * \param module name of the RAPID module containing the RAPID symbol.
+   * \param name the name of the RAPID symbol.
+   * \param data containing the RAPID symbol's new data.
+   *
+   * \throw \a std::runtime_error if something goes wrong.
+   */
+  void setRAPIDSymbolData(const std::string& task,
+                          const std::string& module,
+                          const std::string& name,
+                          const std::string& data);
+
+
+  /**
+   * \brief A method for setting the data of a RAPID symbol.
+   *
+   * \param resource identifying the RAPID symbol.
+   * \param data containing the RAPID symbol's new data.
+   *
+   * \throw \a std::runtime_error if something goes wrong.
+   */
+  void setRAPIDSymbolData(RAPIDResource const& resource,
+                          const RAPIDSymbolDataAbstract& data);
+
 
   /**
    * @brief Save the config domain to the given file.

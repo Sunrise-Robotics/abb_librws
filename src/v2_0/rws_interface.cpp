@@ -728,6 +728,21 @@ RobTarget RWSInterface::getMechanicalUnitRobTarget(const std::string& mechunit,
   return robtarget;
 }
 
+void RWSInterface::setRAPIDSymbolData(const std::string& task,
+                                      const std::string& module,
+                                      const std::string& name,
+                                      const std::string& data)
+{
+  rw::rapid::setRAPIDSymbolData(rws_client_, RAPIDResource(task, module, name), data);
+}
+
+
+void RWSInterface::setRAPIDSymbolData(RAPIDResource const& resource, const RAPIDSymbolDataAbstract& data)
+{
+  rw::rapid::setRAPIDSymbolData(rws_client_, resource, data);
+}
+
+
 SystemInfo RWSInterface::getSystemInfo()
 {
   SystemInfo result;
@@ -756,6 +771,19 @@ SystemInfo RWSInterface::getSystemInfo()
 void RWSInterface::setIOSignal(const std::string& iosignal, const std::string& value)
 {
   rws_client_.setIOSignal(iosignal, value);
+}
+
+std::string RWSInterface::getRAPIDSymbolData(const std::string& task,
+                                             const std::string& module,
+                                             const std::string& name)
+{
+  return rw::rapid::getRAPIDSymbolData(rws_client_, RAPIDResource(task, module, name));
+}
+
+
+void RWSInterface::getRAPIDSymbolData(RAPIDResource const& resource, RAPIDSymbolDataAbstract& data)
+{
+  rw::rapid::getRAPIDSymbolData(rws_client_, resource, data);
 }
 
 void RWSInterface::saveConfigDomain(FileResource const& resource, abb::rws::CFGDomain const& domain)
@@ -808,9 +836,7 @@ void RWSInterface::registerRemoteUser(const std::string& username,
 {
   rws_client_.registerRemoteUser(username, application, location);
 }
-// #########################################################
-// TIMO TIMO TIMO
-// #########################################################
+
 bool RWSInterface::isAutoMode()
 {
   return rw::panel::getOperationMode(rws_client_) == rw::OperationMode::automatic;
@@ -819,6 +845,21 @@ bool RWSInterface::isAutoMode()
 bool RWSInterface::isMotorsOn()
 {
   return rw::panel::getControllerState(rws_client_) == rw::ControllerState::motorOn;
+}
+
+void RWSInterface::startRAPIDExecution()
+{
+  rw::rapid::startRAPIDExecution(rws_client_);
+}
+
+void RWSInterface::stopRAPIDExecution(StopMode stopmode, UseTsp usetsp)
+{
+  rw::rapid::stopRAPIDExecution(rws_client_, stopmode, usetsp);
+}
+
+void RWSInterface::resetRAPIDProgramPointer()
+{
+  rw::rapid::resetRAPIDProgramPointer(rws_client_);
 }
 
 void RWSInterface::setMotorsOn()
@@ -830,7 +871,6 @@ void RWSInterface::setMotorsOff()
 {
   rw::panel::setControllerState(rws_client_, rw::ControllerState::motorOff);
 }
-// #########################################################
 
 void RWSInterface::setDigitalSignal(std::string const& signal_name, bool value)
 {
