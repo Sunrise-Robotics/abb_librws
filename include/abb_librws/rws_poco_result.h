@@ -14,7 +14,7 @@ namespace abb :: rws
   {
     /**
      * \brief A constructor.
-     * 
+     *
      * \param http_status HTTP response status
      * \param reason HTTP reason phrase
      * \param header_info HTTP response header info
@@ -23,7 +23,7 @@ namespace abb :: rws
     POCOResult(Poco::Net::HTTPResponse::HTTPStatus http_status, std::string const& reason,
       Poco::Net::NameValueCollection const& header_info, std::string const& content);
 
-    
+
     /**
      * \brief Status of the HTTP response.
      */
@@ -58,6 +58,17 @@ namespace abb :: rws
     {
       return content_;
     }
+
+
+    /**
+     * \brief Returns a string representation of the result.
+     *
+     * \param verbose indicating if the response content should be included or not.
+     * \param indent for indenting the string.
+     *
+     * \return String representation of the result.
+     */
+    std::string toString(const bool verbose = false, const size_t indent = 0) const;
 
 
   private:

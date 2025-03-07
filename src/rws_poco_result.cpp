@@ -22,4 +22,20 @@ namespace abb :: rws
   , content_ {content}
   {
   };
+
+  std::string POCOResult::toString(const bool verbose, const size_t indent) const
+  {
+    std::stringstream ss;
+
+    std::string seperator = (indent == 0 ? " | " : "\n" + std::string(indent, ' '));
+
+    ss << "HTTP Status: " << static_cast<int>(httpStatus_) << " - " << reason_;
+
+    if (verbose)
+    {
+      ss << seperator << "HTTP Response Content: " << content_;
+    }
+
+    return ss.str();
+  }
 }

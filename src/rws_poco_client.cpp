@@ -149,7 +149,6 @@ POCOResult POCOClient::makeHTTPRequest(const std::string& method,
       authenticate(request, response, content, response_content);
     }
 
-
     return POCOResult {response.getStatus(), response.getReason(), response, response_content};
   }
   catch (CommunicationError const&)

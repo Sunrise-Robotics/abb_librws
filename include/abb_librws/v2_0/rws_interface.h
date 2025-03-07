@@ -78,6 +78,13 @@ public:
   static constexpr MechanicalUnitMode ACTIVATED = MechanicalUnitMode::ACTIVATED;
   static constexpr MechanicalUnitMode DEACTIVATED = MechanicalUnitMode::DEACTIVATED;
 
+  // RAPIDTaskExecutionState states
+  static constexpr RAPIDTaskExecutionState UNKNOWN = RAPIDTaskExecutionState::UNKNOWN;
+  static constexpr RAPIDTaskExecutionState READY = RAPIDTaskExecutionState::READY;
+  static constexpr RAPIDTaskExecutionState STOPPED = RAPIDTaskExecutionState::STOPPED;
+  static constexpr RAPIDTaskExecutionState STARTED = RAPIDTaskExecutionState::STARTED;
+  static constexpr RAPIDTaskExecutionState UNINITIALIZED = RAPIDTaskExecutionState::UNINITIALIZED;
+
   /**
    * \brief A constructor.
    *
@@ -210,7 +217,6 @@ public:
    * \return Mapping from IO signal names to values.
    */
   rw::io::IOSignalInfo getIOSignals();
-
 
   /**
    * \brief A method for retrieving static information about a mechanical unit.
@@ -358,6 +364,15 @@ public:
   std::vector<rw::RAPIDTaskInfo> getRAPIDTasks();
 
   /**
+   * \brief A method for retrieving the robot controller's speed ratio for RAPID motions (e.g. MoveJ and MoveL).
+   *
+   * \return unsigned int with the speed ratio in the range [0, 100] (ie: inclusive).
+   *
+   * \throw \a std::runtime_error if failed to get or parse the speed ratio.
+   */
+  unsigned int getSpeedRatio();
+
+  /**
    * \brief A method for retrieving some system information from the robot controller.
    *
    * \return SystemInfo containing the system information (info will be empty if e.g. a timeout occurred).
@@ -465,6 +480,14 @@ public:
   ///
   void setGroupSignal(std::string const& signal_name, std::uint32_t value);
 
+  /**
+   * \brief Method for retrieving only the most recently logged event as a text string.
+   *
+   * \param verbose indicating if the log text should be verbose or not.
+   *
+   * \return std::string containing the log text. An empty text string is returned if the log is empty.
+   */
+  std::string getLogTextLatestEvent(const bool verbose = false);
 
   /**
    * \brief A method for setting the HTTP communication timeout.
@@ -548,6 +571,18 @@ public:
    * \throw \a std::exception if something goes wrong.
    */
   std::string getFile(const FileResource& resource);
+
+  /**
+   * \brief Overload for getFile that allows the caller to pass a reference to a std::string.
+   *
+   * Note: Depending on the file, then the content can be in text or binary format.
+   *
+   * \param resource specifying the file's directory and name.
+   * \param p_file_content for containing the retrieved file content.
+   *
+   * \return RWSResult containing the result.
+   */
+  RWSResult getFile(const FileResource& resource, std::string* p_file_content);
 
   /**
    * \brief A method for uploading a file to the robot controller.
@@ -637,9 +672,16 @@ public:
    */
   rw::RAPIDTaskPcpState getTaskPointersPosition(const std::string& task);
 
-private:
-  using RWSResult = RWSClient::RWSResult;
+  /**
+   * \brief A method for retrieving the value if an IO signal.
+   *
+   * \param iosignal for the name of the IO signal.
+   *
+   * \return std::string containing the IO signal's value (empty if not found).
+   */
+  std::string getIOSignal(const std::string& iosignal);
 
+private:
 
   /**
    * \brief A method for comparing a single text content (from a XML document node) with a specific string value.
@@ -653,16 +695,6 @@ private:
   static bool compareSingleContent(const RWSResult& rws_result,
                                const XMLAttribute& attribute,
                                const std::string& compare_string);
-
-  /**
-   * \brief A method for retrieving the value if an IO signal.
-   *
-   * \param iosignal for the name of the IO signal.
-   *
-   * \return std::string containing the IO signal's value (empty if not found).
-   */
-  std::string getIOSignal(const std::string& iosignal);
-
 
   /**
    * \brief The RWS client used to communicate with the robot controller.

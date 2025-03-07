@@ -124,7 +124,6 @@ namespace rws
      */
     Poco::Net::WebSocket webSocketConnect(const std::string& uri, const std::string& protocol, Poco::Net::HTTPClientSession&& session);
 
-
     /**
      * \brief Method for retrieving the internal log as a text string.
      *
@@ -134,7 +133,6 @@ namespace rws
      */
     std::string getLogText(bool verbose = false) const;
 
-
     /**
      * \brief Method for retrieving only the most recently logged event as a text string.
      *
@@ -143,7 +141,6 @@ namespace rws
      * \return std::string containing the log text. An empty text string is returned if the log is empty.
      */
     std::string getLogTextLatestEvent(bool verbose = false) const;
-
 
   private:
     /**
@@ -220,6 +217,12 @@ namespace rws
        */
       void addHTTPResponseInfo(const Poco::Net::HTTPResponse& response, const std::string& response_content = "");
 
+      /**
+       * \brief A method to map the general status to a std::string.
+       *
+       * \return std::string containing the mapped general status.
+       */
+      std::string mapGeneralStatus() const;
 
       /**
        * \brief A method to construct a text representation of the result.

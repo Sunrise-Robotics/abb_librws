@@ -856,6 +856,11 @@ std::vector<rw::RAPIDTaskInfo> RWSInterface::getRAPIDTasks()
   return rw::rapid::getRAPIDTasks(rws_client_);
 }
 
+unsigned int RWSInterface::getSpeedRatio()
+{
+  return rw::panel::getSpeedRatio(rws_client_);
+}
+
 void RWSInterface::saveConfigDomain(FileResource const& resource, abb::rws::CFGDomain const& domain)
 {
     std::stringstream uri;
@@ -867,6 +872,8 @@ void RWSInterface::saveConfigDomain(FileResource const& resource, abb::rws::CFGD
 
     POCOResult result = rws_client_.httpPost(uri.str(), content, content_type, {Poco::Net::HTTPResponse::HTTP_NO_CONTENT});
 }
+
+
 
 std::string RWSInterface::getFile(const FileResource& resource)
 {
@@ -905,6 +912,11 @@ void RWSInterface::registerRemoteUser(const std::string& username,
                                       const std::string& location)
 {
   rws_client_.registerRemoteUser(username, application, location);
+}
+
+std::string RWSInterface::getLogTextLatestEvent(const bool verbose)
+{
+  return rws_client_.getLogTextLatestEvent(verbose);
 }
 
 bool RWSInterface::isAutoMode()

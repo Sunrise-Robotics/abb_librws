@@ -47,6 +47,9 @@ namespace rws
 // Add direct type alias for TriBool in the abb::rws namespace
 using TriBool = v2_0::TriBool;
 
+// Add direct type alias for RWSClient in the abb::rws namespace
+using RWSClient = v2_0::RWSClient;
+
 // Define RWSInterface with necessary nested types for backward compatibility
 class RWSInterface : public v2_0::RWSInterface
 {

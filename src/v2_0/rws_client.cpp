@@ -279,6 +279,10 @@ RWSClient::RWSResult RWSClient::parseContent(const POCOResult& poco_result)
   return parser_.parseString(poco_result.content());
 }
 
+std::string RWSClient::getLogTextLatestEvent(const bool verbose)
+{
+  return (log_.empty() ? "" : log_[0].toString(verbose, 0));
+}
 
 std::string RWSClient::generateConfigurationPath(const std::string& topic, const std::string& type)
 {

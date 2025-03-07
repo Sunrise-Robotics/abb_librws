@@ -43,6 +43,7 @@
 #include <abb_librws/system_constants.h>
 #include <abb_librws/rws_rapid.h>
 #include <abb_librws/rws_poco_client.h>
+#include <abb_librws/rws_poco_result.h>
 #include <abb_librws/rws_subscription.h>
 #include <abb_librws/coordinate.h>
 #include <abb_librws/connection_options.h>
@@ -74,6 +75,11 @@ public:
    * \brief A struct for containing an evaluated communication result.
    */
   using RWSResult = Poco::AutoPtr<Poco::XML::Document>;
+
+  /**
+   * \brief Type alias for using FileResource from abb::rws namespace as a nested type.
+   */
+  using FileResource = abb::rws::FileResource;
 
   /**
    * \brief A constructor.
@@ -213,6 +219,18 @@ public:
   std::string getFile(const FileResource& resource);
 
   /**
+   * \brief A method for retrieving a file from the robot controller.
+   *
+   * Note: Depending on the file, then the content can be in text or binary format.
+   *
+   * \param resource specifying the file's directory and name.
+   * \param p_file_content for containing the retrieved file content.
+   *
+   * \return RWSResult containing the result.
+   */
+  RWSResult getFile(const FileResource& resource, std::string* p_file_content);
+
+  /**
    * \brief A method for uploading a file to the robot controller.
    *
    * \param resource specifying the file's directory and name.
@@ -319,6 +337,15 @@ public:
     session_.reset();
   }
 
+  /**
+   * \brief Method for retrieving only the most recently logged event as a text string.
+   *
+   * \param verbose indicating if the log text should be verbose or not.
+   *
+   * \return std::string containing the log text. An empty text string is returned if the log is empty.
+   */
+  std::string getLogTextLatestEvent(const bool verbose = false);
+
 private:
   /**
    * \brief Method for parsing a communication result into an XML document.
@@ -372,6 +399,11 @@ private:
    * \return std::string containing the path.
    */
   static std::string generateFilePath(const FileResource& resource);
+
+    /**
+   * \brief Container for logging communication results.
+   */
+  std::deque<POCOResult> log_;
 
   ConnectionOptions const connectionOptions_;
   Poco::Net::Context::Ptr context_;
