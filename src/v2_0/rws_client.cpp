@@ -405,7 +405,6 @@ POCOResult RWSClient::httpDelete(const std::string& uri,
   return result;
 }
 
-
 Poco::Net::WebSocket RWSClient::receiveSubscription(std::string const& subscription_group_id)
 {
   return http_client_.webSocketConnect("/poll/" + subscription_group_id, "rws_subscription",

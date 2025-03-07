@@ -42,6 +42,7 @@
 
 #include <abb_librws/rws_cfg.h>
 #include <abb_librws/common/rw/io.h>
+#include <abb_librws/common/rw/rapid.h>
 #include <abb_librws/rws_info.h>
 #include <abb_librws/xml_attribute.h>
 
@@ -60,12 +61,42 @@ namespace abb :: rws :: v2_0
 class RWSInterface
 {
 public:
+  // Type aliases for types from rapid.h
+  using RAPIDRunMode = rw::RAPIDRunMode;
+  using RAPIDExecutionState = rw::RAPIDExecutionState;
+  using RAPIDExecutionInfo = rw::RAPIDExecutionInfo;
+  using RAPIDModuleInfo = rw::RAPIDModuleInfo;
+  using RAPIDTaskExecutionState = rw::RAPIDTaskExecutionState;
+  using RAPIDTaskInfo = rw::RAPIDTaskInfo;
+  using RAPIDPcpInfo = rw::RAPIDPcpInfo;
+  using RAPIDTaskPcpState = rw::RAPIDTaskPcpState;
+  using MechanicalUnitType = rws::MechanicalUnitType;
+  using MechanicalUnitMode = rws::MechanicalUnitMode;
+
+  // Static constants for MechanicalUnitMode enum values
+  static constexpr MechanicalUnitMode UNKNOWN_MODE = MechanicalUnitMode::UNKNOWN_MODE;
+  static constexpr MechanicalUnitMode ACTIVATED = MechanicalUnitMode::ACTIVATED;
+  static constexpr MechanicalUnitMode DEACTIVATED = MechanicalUnitMode::DEACTIVATED;
+
   /**
    * \brief A constructor.
    *
    * \param client RWS client
    */
   explicit RWSInterface(RWSClient& client);
+
+  /**
+   * \brief A constructor for direct initialization with connection parameters.
+   *
+   * \param ip_address specifying the robot controller's IP address.
+   * \param port_number for the port used by the RWS server.
+   * \param username for the username to the RWS server.
+   * \param password for the password to the RWS server.
+   */
+  RWSInterface(const std::string& ip_address,
+               const unsigned short port_number,
+               const std::string& username,
+               const std::string& password);
 
   /**
    * \brief Retrieves the configuration instances for the arms defined in the system.
@@ -193,6 +224,18 @@ public:
   MechanicalUnitStaticInfo getMechanicalUnitStaticInfo(const std::string& mechunit);
 
   /**
+   * \brief Overload for getMechanicalUnitStaticInfo that allows the caller to pass a reference to a MechanicalUnitStaticInfo struct.
+   *
+   * \param mechunit for the mechanical unit's name.
+   * \param static_info for the reference to the MechanicalUnitStaticInfo struct.
+   *
+   * \return true if the operation was successful, false otherwise.
+   *
+   * \throw \a std::runtime_error if something goes wrong.
+   */
+  bool getMechanicalUnitStaticInfo(const std::string& mechunit, MechanicalUnitStaticInfo& static_info);
+
+  /**
    * \brief A method for retrieving dynamic information about a mechanical unit.
    *
    * \param mechunit for the mechanical unit's name.
@@ -204,6 +247,18 @@ public:
   MechanicalUnitDynamicInfo getMechanicalUnitDynamicInfo(const std::string& mechunit);
 
   /**
+   * \brief Overload for getMechanicalUnitDynamicInfo that allows the caller to pass a reference to a MechanicalUnitDynamicInfo struct.
+   *
+   * \param mechunit for the mechanical unit's name.
+   * \param dynamic_info for the reference to the MechanicalUnitDynamicInfo struct.
+   *
+   * \return true if the operation was successful, false otherwise.
+   *
+   * \throw \a std::runtime_error if something goes wrong.
+   */
+  bool getMechanicalUnitDynamicInfo(const std::string& mechunit, MechanicalUnitDynamicInfo& dynamic_info);
+
+  /**
    * \brief A method for retrieving the current jointtarget values of a mechanical unit.
    *
    * \param mechunit for the mechanical unit's name.
@@ -213,6 +268,18 @@ public:
    * \throw \a std::runtime_error if something goes wrong.
    */
   JointTarget getMechanicalUnitJointTarget(const std::string& mechunit);
+
+  /**
+   * \brief Overload for getMechanicalUnitJointTarget that allows the caller to pass a reference to a JointTarget struct.
+   *
+   * \param mechunit for the mechanical unit's name.
+   * \param p_jointtarget for the reference to the JointTarget struct.
+   *
+   * \return true if the operation was successful, false otherwise.
+   *
+   * \throw \a std::runtime_error if something goes wrong.
+   */
+  bool getMechanicalUnitJointTarget(const std::string& mechunit, JointTarget* joint_target);
 
   /**
    * \brief A method for retrieving the current robtarget values of a mechanical unit.
@@ -257,6 +324,38 @@ public:
    */
   void getRAPIDSymbolData(RAPIDResource const& resource, RAPIDSymbolDataAbstract& data);
 
+  /**
+   * \brief A method for retrieving the data of a RAPID symbol (parsed into a struct representing the RAPID data).
+   *
+   * \param task for the name of the RAPID task containing the RAPID symbol.
+   * \param module for the name of the RAPID module containing the RAPID symbol.
+   * \param name for the name of the RAPID symbol.
+   * \param p_data for storing the retrieved RAPID symbol data.
+   *
+   * \return bool indicating if the communication was successful or not. Note: No checks are made for "correct parsing".
+   */
+  bool getRAPIDSymbolData(const std::string& task,
+                          const std::string& module,
+                          const std::string& name,
+                          RAPIDSymbolDataAbstract* p_data);
+
+  /**
+   * \brief A method for retrieving information about the RAPID modules of a RAPID task defined in the robot controller.
+   *
+   * \return \a std::vector<RAPIDModuleInfo> containing the RAPID modules information.
+   *
+   * \throw \a std::runtime_error if something goes wrong.
+   */
+  std::vector<rw::RAPIDModuleInfo> getRAPIDModulesInfo(const std::string& task);
+
+  /**
+   * \brief A method for retrieving information about the RAPID tasks defined in the robot controller.
+   *
+   * \return \a std::vector<RAPIDTaskInfo> containing the RAPID tasks information.
+   *
+   * \throw \a std::runtime_error if something goes wrong.
+   */
+  std::vector<rw::RAPIDTaskInfo> getRAPIDTasks();
 
   /**
    * \brief A method for retrieving some system information from the robot controller.
@@ -334,6 +433,15 @@ public:
    * \throw \a std::runtime_error if something goes wrong.
    */
 
+  /**
+   * \brief A method for checking if RAPID is running.
+   *
+   * \return if RAPID is running or not.
+   *
+   * \throw \a std::runtime_error if something goes wrong.
+   */
+  bool isRAPIDRunning();
+
   /// @brief Set value of a digital signal
   ///
   /// @param signal_name Name of the signal
@@ -357,6 +465,26 @@ public:
   ///
   void setGroupSignal(std::string const& signal_name, std::uint32_t value);
 
+
+  /**
+   * \brief A method for setting the HTTP communication timeout.
+   *
+   * \param timeout for the HTTP communication timeout [microseconds].
+   */
+  void setHTTPTimeout(const Poco::Int64 timeout)
+  {
+    rws_client_.setHTTPTimeout(timeout);
+  }
+
+  /**
+   * \brief A method for setting the value of an IO signal.
+   *
+   * \param iosignal for the name of the IO signal.
+   * \param value for the IO signal's new value.
+   *
+   * \throw \a std::runtime_error if something goes wrong.
+   */
+  void setIOSignal(const std::string& iosignal, const std::string& value);
 
   /**
    * \brief A method for setting the data of a RAPID symbol via raw text format.
@@ -534,17 +662,6 @@ private:
    * \return std::string containing the IO signal's value (empty if not found).
    */
   std::string getIOSignal(const std::string& iosignal);
-
-
-  /**
-   * \brief A method for setting the value of an IO signal.
-   *
-   * \param iosignal for the name of the IO signal.
-   * \param value for the IO signal's new value.
-   *
-   * \throw \a std::runtime_error if something goes wrong.
-   */
-  void setIOSignal(const std::string& iosignal, const std::string& value);
 
 
   /**

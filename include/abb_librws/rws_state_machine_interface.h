@@ -38,11 +38,32 @@
 #define RWS_STATE_MACHINE_INTERFACE_H
 
 #include <abb_librws/v2_0/rws_interface.h>
+#include <abb_librws/rws_info.h>
 
 namespace abb
 {
 namespace rws
 {
+// Add direct type alias for TriBool in the abb::rws namespace
+using TriBool = v2_0::TriBool;
+
+// Define RWSInterface with necessary nested types for backward compatibility
+class RWSInterface : public v2_0::RWSInterface
+{
+public:
+    using v2_0::RWSInterface::RWSInterface;  // Inherit constructors
+
+    // Add the types that are expected to be nested within RWSInterface
+    using MechanicalUnitStaticInfo = abb::rws::MechanicalUnitStaticInfo;
+    using MechanicalUnitDynamicInfo = abb::rws::MechanicalUnitDynamicInfo;
+    // using getMechanicalUnitJointTarget = abb::rws::getMechanicalUnitJointTarget;
+    using RAPIDTaskInfo = abb::rws::rw::RAPIDTaskInfo;
+    using RAPIDModuleInfo = abb::rws::rw::RAPIDModuleInfo;
+    using SystemInfo = abb::rws::SystemInfo;
+    using TriBool = abb::rws::TriBool;
+};
+
+
 /**
  * \brief User friendly interface to ABB robot controller systems, which are based on a corresponding RobotWare AddIn.
  *
@@ -55,7 +76,7 @@ namespace rws
  *       - If the RobotWare option Externally Guided Motion (EGM) is present.
  *       - If the SmartGripper (SG) product is present.
  */
-class RWSStateMachineInterface : public v2_0::RWSInterface
+class RWSStateMachineInterface : public RWSInterface // Now inheriting from our custom RWSInterface
 {
 private:
   /**
@@ -64,6 +85,35 @@ private:
   class Services;
 
 public:
+  /**
+   * \brief A constructor.
+   *
+   * \param client RWS client.
+   */
+  RWSStateMachineInterface(v2_0::RWSClient& client)
+  :
+  RWSInterface {client},
+  services_(this)
+  {}
+
+  /**
+   * \brief A constructor for direct initialization with connection parameters.
+   *
+   * \param ip_address specifying the robot controller's IP address.
+   * \param port_number for the port used by the RWS server.
+   * \param username for the username to the RWS server.
+   * \param password for the password to the RWS server.
+   */
+  RWSStateMachineInterface(const std::string& ip_address,
+                          const unsigned short port_number,
+                          const std::string& username,
+                          const std::string& password)
+  :
+
+  RWSInterface(ip_address, port_number, username, password),
+  services_(this)
+  {}
+
   /**
    * \brief Representation of the StateMachine AddIn's different states.
    */
@@ -706,17 +756,6 @@ public:
      */
     RAPIDNum physical_limit;
   };
-
-  /**
-   * \brief A constructor.
-   *
-   * \param client RWS client.
-   */
-  RWSStateMachineInterface(v2_0::RWSClient& client)
-  :
-  RWSInterface {client},
-  services_(this)
-  {}
 
   /**
    * \brief Services provided by the StateMachine AddIn.

@@ -307,6 +307,17 @@ public:
   POCOResult httpDelete(const std::string& uri,
     std::set<Poco::Net::HTTPResponse::HTTPStatus> const& accepted_status = {Poco::Net::HTTPResponse::HTTP_OK, Poco::Net::HTTPResponse::HTTP_NO_CONTENT});
 
+  /**
+   * \brief Sets the timeout for HTTP requests.
+   *
+   * \param timeout the timeout value in microseconds.
+   */
+
+  void setHTTPTimeout(const Poco::Int64 timeout)
+  {
+    session_.setTimeout(Poco::Timespan(timeout));
+    session_.reset();
+  }
 
 private:
   /**

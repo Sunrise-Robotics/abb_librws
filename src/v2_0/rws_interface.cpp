@@ -608,6 +608,19 @@ MechanicalUnitStaticInfo RWSInterface::getMechanicalUnitStaticInfo(const std::st
   return static_info;
 }
 
+bool RWSInterface::getMechanicalUnitStaticInfo(const std::string& mechunit, MechanicalUnitStaticInfo& static_info)
+{
+  try{
+    static_info = getMechanicalUnitStaticInfo(mechunit);
+  }
+  catch(const std::runtime_error& e)
+  {
+    return false;
+  }
+
+  return true;
+}
+
 MechanicalUnitDynamicInfo RWSInterface::getMechanicalUnitDynamicInfo(const std::string& mechunit)
 {
   bool result = false;
@@ -669,6 +682,19 @@ MechanicalUnitDynamicInfo RWSInterface::getMechanicalUnitDynamicInfo(const std::
   return dynamic_info;
 }
 
+bool RWSInterface::getMechanicalUnitDynamicInfo(const std::string& mechunit, MechanicalUnitDynamicInfo& dynamic_info)
+{
+  try{
+    dynamic_info = getMechanicalUnitDynamicInfo(mechunit);
+  }
+  catch(const std::runtime_error& e)
+  {
+    return false;
+  }
+
+  return true;
+}
+
 JointTarget RWSInterface::getMechanicalUnitJointTarget(const std::string& mechunit)
 {
   RWSResult rws_result = rws_client_.getMechanicalUnitJointTarget(mechunit);
@@ -692,6 +718,19 @@ JointTarget RWSInterface::getMechanicalUnitJointTarget(const std::string& mechun
   jointtarget.parseString(ss.str());
 
   return jointtarget;
+}
+
+bool RWSInterface::getMechanicalUnitJointTarget(const std::string& mechunit, JointTarget* joint_target)
+{
+  try{
+    *joint_target = getMechanicalUnitJointTarget(mechunit);
+  }
+  catch(const std::runtime_error& e)
+  {
+    return false;
+  }
+
+  return true;
 }
 
 RobTarget RWSInterface::getMechanicalUnitRobTarget(const std::string& mechunit,
@@ -768,6 +807,11 @@ SystemInfo RWSInterface::getSystemInfo()
   return result;
 }
 
+bool RWSInterface::isRAPIDRunning()
+{
+  return rw::rapid::getRAPIDExecution(rws_client_).ctrlexecstate == rw::RAPIDExecutionState::running;
+}
+
 void RWSInterface::setIOSignal(const std::string& iosignal, const std::string& value)
 {
   rws_client_.setIOSignal(iosignal, value);
@@ -784,6 +828,32 @@ std::string RWSInterface::getRAPIDSymbolData(const std::string& task,
 void RWSInterface::getRAPIDSymbolData(RAPIDResource const& resource, RAPIDSymbolDataAbstract& data)
 {
   rw::rapid::getRAPIDSymbolData(rws_client_, resource, data);
+}
+
+bool RWSInterface::getRAPIDSymbolData(const std::string& task,
+                                      const std::string& module,
+                                      const std::string& name,
+                                      RAPIDSymbolDataAbstract* p_data)
+{
+  try{
+    getRAPIDSymbolData(RAPIDResource(task, module, name), *p_data);
+  }
+  catch(const std::runtime_error& e)
+  {
+    return false;
+  }
+
+  return true;
+}
+
+std::vector<rw::RAPIDModuleInfo> RWSInterface::getRAPIDModulesInfo(const std::string& task)
+{
+  return rw::rapid::getRAPIDModulesInfo(rws_client_, task);
+}
+
+std::vector<rw::RAPIDTaskInfo> RWSInterface::getRAPIDTasks()
+{
+  return rw::rapid::getRAPIDTasks(rws_client_);
 }
 
 void RWSInterface::saveConfigDomain(FileResource const& resource, abb::rws::CFGDomain const& domain)

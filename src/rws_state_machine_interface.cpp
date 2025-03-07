@@ -112,7 +112,7 @@ EGMActions RWSStateMachineInterface::Services::EGM::getCurrentAction(const std::
   RAPIDNum temp_current_action;
 
   p_rws_interface_->getRAPIDSymbolData({task, Symbols::EGM_CURRENT_ACTION}, temp_current_action);
-  
+
   switch ((int) temp_current_action.value)
   {
     case EGM_ACTION_STOP:
