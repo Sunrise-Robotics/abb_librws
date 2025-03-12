@@ -89,7 +89,7 @@ private:
 
 public:
   /**
-   * \brief A constructor.
+   * \brief A constructor that takes a pre-existing RWS client.
    *
    * \param client RWS client.
    */
@@ -100,21 +100,21 @@ public:
   {}
 
   /**
-   * \brief A constructor for direct initialization with connection parameters.
+   * \brief A constructor that creates an RWS client from connection parameters.
    *
-   * \param ip_address specifying the robot controller's IP address.
-   * \param port_number for the port used by the RWS server.
-   * \param username for the username to the RWS server.
-   * \param password for the password to the RWS server.
+   * \param ip_address IP address of the robot controller.
+   * \param port_number Port number of the robot controller.
+   * \param username Username for the RWS authentication.
+   * \param password Password for the RWS authentication.
    */
   RWSStateMachineInterface(const std::string& ip_address,
-                          const unsigned short port_number,
-                          const std::string& username,
-                          const std::string& password)
+                         const unsigned short port_number,
+                         const std::string& username,
+                         const std::string& password)
   :
-
-  RWSInterface(ip_address, port_number, username, password),
-  services_(this)
+  RWSInterface{*createClient(ip_address, port_number, username, password)},
+  services_(this),
+  owned_client_(createClient(ip_address, port_number, username, password))
   {}
 
   /**
@@ -883,7 +883,7 @@ private:
        * \param task specifying the RAPID task.
        * \param p_settings for storing the retrieved data.
        */
-      void getSettings(const std::string& task, EGMSettings* p_settings) const;
+      bool getSettings(const std::string& task, EGMSettings* p_settings) const;
 
       /**
        * \brief Set the settings for the EGM RAPID instructions.
@@ -891,32 +891,32 @@ private:
        * \param task specifying the RAPID task.
        * \param settings containing the new data.
        */
-      void setSettings(const std::string& task, const EGMSettings& settings) const;
+      bool setSettings(const std::string& task, const EGMSettings& settings) const;
 
       /**
        * \brief Signal the StateMachine AddIn to start EGM joint motions.
        */
-      void signalEGMStartJoint() const;
+      bool signalEGMStartJoint() const;
 
       /**
        * \brief Signal the StateMachine AddIn to start EGM pose motions.
        */
-      void signalEGMStartPose() const;
+      bool signalEGMStartPose() const;
 
       /**
        * \brief Signal the StateMachine AddIn to start EGM position streaming.
        */
-      void signalEGMStartStream() const;
+      bool signalEGMStartStream() const;
 
       /**
        * \brief Signal the StateMachine AddIn to stop any current EGM motions.
        */
-      void signalEGMStop() const;
+      bool signalEGMStop() const;
 
       /**
        * \brief Signal the StateMachine AddIn to stop any current position streaming.
        */
-      void signalEGMStopStream() const;
+      bool signalEGMStopStream() const;
 
     private:
       /**
@@ -1049,14 +1049,14 @@ private:
        * \param task specifying the RAPID task.
        * \param routine_name containing the new data.
        */
-      void setRoutineName(const std::string& task, const std::string& routine_name) const;
+      bool setRoutineName(const std::string& task, const std::string& routine_name) const;
 
       /**
        * \brief Signal the StateMachine AddIn to run RAPID routine(s).
        *
        * \return void indicating if the signaling was successful or not.
        */
-      void signalRunRAPIDRoutine() const;
+      bool signalRunRAPIDRoutine() const;
 
     private:
       /**
@@ -1329,7 +1329,7 @@ private:
       /**
        * \brief Signal the StateMachine to run SmartGripper routine(s).
        */
-      void signalRunSGRoutine() const;
+      bool signalRunSGRoutine() const;
 
     private:
       /**
@@ -1496,6 +1496,27 @@ private:
    * \brief Services provided by the StateMachine AddIn.
    */
   Services services_;
+
+  /**
+   * \brief Helper method to create an RWS client from connection parameters.
+   *
+   * \param ip_address IP address of the robot controller.
+   * \param port_number Port number of the robot controller.
+   * \param username Username for the RWS authentication.
+   * \param password Password for the RWS authentication.
+   * \return Shared pointer to a newly created RWS client.
+   */
+  std::shared_ptr<v2_0::RWSClient> createClient(const std::string& ip_address,
+                                             const unsigned short port_number,
+                                             const std::string& username,
+                                             const std::string& password)
+  {
+    abb::rws::ConnectionOptions options(ip_address, port_number, username, password);
+    return std::make_shared<v2_0::RWSClient>(options);
+  }
+
+  /** \brief Owned client instance, when created internally */
+  std::shared_ptr<v2_0::RWSClient> owned_client_;
 };
 
 } // end namespace rws

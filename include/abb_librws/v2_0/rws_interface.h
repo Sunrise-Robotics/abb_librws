@@ -93,19 +93,6 @@ public:
   explicit RWSInterface(RWSClient& client);
 
   /**
-   * \brief A constructor for direct initialization with connection parameters.
-   *
-   * \param ip_address specifying the robot controller's IP address.
-   * \param port_number for the port used by the RWS server.
-   * \param username for the username to the RWS server.
-   * \param password for the password to the RWS server.
-   */
-  RWSInterface(const std::string& ip_address,
-               const unsigned short port_number,
-               const std::string& username,
-               const std::string& password);
-
-  /**
    * \brief Retrieves the configuration instances for the arms defined in the system.
    *
    * \return std::vector<cfg::moc::Arm> containing a list of the arms defined in the system.
@@ -399,7 +386,7 @@ public:
    *
    * \throw \a std::runtime_error if something goes wrong.
    */
-  void startRAPIDExecution();
+  bool startRAPIDExecution();
 
   /**
    * \brief A method for stopping RAPID execution in the robot controller.
@@ -413,14 +400,14 @@ public:
    *
    * \throw \a std::runtime_error if something goes wrong.
    */
-  void stopRAPIDExecution(StopMode stopmode = StopMode::stop, UseTsp usetsp = UseTsp::normal);
+  bool stopRAPIDExecution(StopMode stopmode = StopMode::stop, UseTsp usetsp = UseTsp::normal);
 
   /**
    * \brief A method for reseting the RAPID program pointer in the robot controller.
    *
    * \throw \a std::runtime_error if something goes wrong.
    */
-  void resetRAPIDProgramPointer();
+  bool resetRAPIDProgramPointer();
 
   /**
    * \brief A method for checking if RAPID is running.
@@ -429,14 +416,14 @@ public:
    *
    * \throw \a std::runtime_error if something goes wrong.
    */
-  void setMotorsOn();
+  bool setMotorsOn();
 
   /**
    * \brief A method for turning off the robot controller's motors.
    *
    * \throw \a std::runtime_error if something goes wrong.
    */
-  void setMotorsOff();
+  bool setMotorsOff();
 
   /**
    * \brief A method for setting the robot controller's speed ratio for RAPID motions (e.g. MoveJ and MoveL).
@@ -447,6 +434,17 @@ public:
    *
    * \throw \a std::runtime_error if something goes wrong.
    */
+
+  /**
+   * \brief A method for setting the robot controller's speed ratio for RAPID motions (e.g. MoveJ and MoveL).
+   *
+   * Note: The ratio must be an integer in the range [0, 100] (ie: inclusive).
+   *
+   * \param ratio specifying the new ratio.
+   *
+   * \throw \a std::runtime_error if something goes wrong.
+   */
+  bool setSpeedRatio(unsigned int ratio);
 
   /**
    * \brief A method for checking if RAPID is running.
@@ -462,7 +460,7 @@ public:
   /// @param signal_name Name of the signal
   /// @param value New value of the signal
   ///
-  void setDigitalSignal(std::string const& signal_name, bool value);
+  bool setDigitalSignal(std::string const& signal_name, bool value);
 
 
   /// @brief Set value of an analog signal
@@ -507,7 +505,7 @@ public:
    *
    * \throw \a std::runtime_error if something goes wrong.
    */
-  void setIOSignal(const std::string& iosignal, const std::string& value);
+  bool setIOSignal(const std::string& iosignal, const std::string& value);
 
   /**
    * \brief A method for setting the data of a RAPID symbol via raw text format.
@@ -534,11 +532,38 @@ public:
    *
    * \throw \a std::runtime_error if something goes wrong.
    */
-  void setRAPIDSymbolData(const std::string& task,
+  bool setRAPIDSymbolData(const std::string& task,
                           const std::string& module,
                           const std::string& name,
                           const std::string& data);
 
+  /**
+   * \brief A method for setting the data of a RAPID symbol.
+   *
+   * \param task for the name of the RAPID task containing the RAPID symbol.
+   * \param module for the name of the RAPID module containing the RAPID symbol.
+   * \param name for the name of the RAPID symbol.
+   * \param data for the RAPID symbol's new data.
+   *
+   * \throw \a std::runtime_error if something goes wrong.
+   */
+  bool setRAPIDSymbolData(const std::string& task,
+                          const std::string& module,
+                          const std::string& name,
+                          const RAPIDSymbolDataAbstract& data);
+
+  /**
+   * \brief A method for setting the data of a RAPID symbol.
+   *
+   * \param task for the name of the RAPID task containing the RAPID symbol.
+   * \param symbol indicating the RAPID symbol resource (name and module).
+   * \param data containing the RAPID symbol's new data.
+   *
+   * \return bool indicating if the communication was successful or not.
+   */
+  bool setRAPIDSymbolData(const std::string& task,
+                          const RAPIDSymbolResource& symbol,
+                          const RAPIDSymbolDataAbstract& data);
 
   /**
    * \brief A method for setting the data of a RAPID symbol.
@@ -592,7 +617,7 @@ public:
    *
    * \throw \a std::exception if something goes wrong.
    */
-  void uploadFile(const FileResource& resource, const std::string& file_content);
+  bool uploadFile(const FileResource& resource, const std::string& file_content);
 
   /**
    * \brief A method for loading a SafeMove configuration to the robot controller.

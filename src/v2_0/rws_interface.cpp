@@ -767,12 +767,42 @@ RobTarget RWSInterface::getMechanicalUnitRobTarget(const std::string& mechunit,
   return robtarget;
 }
 
-void RWSInterface::setRAPIDSymbolData(const std::string& task,
+bool RWSInterface::setRAPIDSymbolData(const std::string& task,
                                       const std::string& module,
                                       const std::string& name,
                                       const std::string& data)
 {
-  rw::rapid::setRAPIDSymbolData(rws_client_, RAPIDResource(task, module, name), data);
+  try
+  {
+    rw::rapid::setRAPIDSymbolData(rws_client_, RAPIDResource(task, module, name), data);
+  }
+  catch (const std::exception&)
+  {
+    return false;
+  }
+  return true;
+}
+
+bool RWSInterface::setRAPIDSymbolData(const std::string& task,
+                                      const std::string& module,
+                                      const std::string& name,
+                                      const RAPIDSymbolDataAbstract& data)
+{
+  return setRAPIDSymbolData(task, module, name, data);
+}
+
+bool RWSInterface::setRAPIDSymbolData(const std::string& task,
+                                      const RAPIDSymbolResource& symbol,
+                                      const RAPIDSymbolDataAbstract& data)
+{
+  try{
+    rw::rapid::setRAPIDSymbolData(rws_client_, RAPIDResource(task, symbol), data);
+  }
+  catch (const std::exception&)
+  {
+    return false;
+  }
+  return true;
 }
 
 
@@ -812,9 +842,17 @@ bool RWSInterface::isRAPIDRunning()
   return rw::rapid::getRAPIDExecution(rws_client_).ctrlexecstate == rw::RAPIDExecutionState::running;
 }
 
-void RWSInterface::setIOSignal(const std::string& iosignal, const std::string& value)
+bool RWSInterface::setIOSignal(const std::string& iosignal, const std::string& value)
 {
-  rws_client_.setIOSignal(iosignal, value);
+  try
+  {
+    rws_client_.setIOSignal(iosignal, value);
+  }
+  catch (const std::exception&)
+  {
+    return false;
+  }
+  return true;
 }
 
 std::string RWSInterface::getRAPIDSymbolData(const std::string& task,
@@ -880,9 +918,17 @@ std::string RWSInterface::getFile(const FileResource& resource)
   return rws_client_.getFile(resource);
 }
 
-void RWSInterface::uploadFile(const FileResource& resource, const std::string& file_content)
+bool RWSInterface::uploadFile(const FileResource& resource, const std::string& file_content)
 {
-  rws_client_.uploadFile(resource, file_content);
+  try
+  {
+    rws_client_.uploadFile(resource, file_content);
+  }
+  catch (const std::exception&)
+  {
+    return false;
+  }
+  return true;
 }
 
 void RWSInterface::deleteFile(const FileResource& resource)
@@ -929,36 +975,96 @@ bool RWSInterface::isMotorsOn()
   return rw::panel::getControllerState(rws_client_) == rw::ControllerState::motorOn;
 }
 
-void RWSInterface::startRAPIDExecution()
+bool RWSInterface::startRAPIDExecution()
 {
-  rw::rapid::startRAPIDExecution(rws_client_);
+  try
+  {
+    rw::rapid::startRAPIDExecution(rws_client_);
+  }
+  catch (const std::exception&)
+  {
+    return false;
+  }
+  return true;
 }
 
-void RWSInterface::stopRAPIDExecution(StopMode stopmode, UseTsp usetsp)
+bool RWSInterface::stopRAPIDExecution(StopMode stopmode, UseTsp usetsp)
 {
-  rw::rapid::stopRAPIDExecution(rws_client_, stopmode, usetsp);
+  try
+  {
+    rw::rapid::stopRAPIDExecution(rws_client_, stopmode, usetsp);
+  }
+  catch (const std::exception&)
+  {
+    return false;
+  }
+  return true;
 }
 
-void RWSInterface::resetRAPIDProgramPointer()
+bool RWSInterface::resetRAPIDProgramPointer()
 {
-  rw::rapid::resetRAPIDProgramPointer(rws_client_);
+  try
+  {
+    rw::rapid::resetRAPIDProgramPointer(rws_client_);
+  }
+  catch (const std::exception&)
+  {
+    return false;
+  }
+  return true;
 }
 
-void RWSInterface::setMotorsOn()
+bool RWSInterface::setMotorsOn()
 {
-  rw::panel::setControllerState(rws_client_, rw::ControllerState::motorOn);
+  try
+  {
+    rw::panel::setControllerState(rws_client_, rw::ControllerState::motorOn);
+  }
+  catch (const std::exception&)
+  {
+    return false;
+  }
+  return true;
 }
 
-void RWSInterface::setMotorsOff()
+bool RWSInterface::setMotorsOff()
 {
-  rw::panel::setControllerState(rws_client_, rw::ControllerState::motorOff);
+  try
+  {
+    rw::panel::setControllerState(rws_client_, rw::ControllerState::motorOff);
+  }
+  catch (const std::exception&)
+  {
+    return false;
+  }
+  return true;
 }
 
-void RWSInterface::setDigitalSignal(std::string const& signal_name, bool value)
+bool RWSInterface::setSpeedRatio(unsigned int ratio)
 {
-  setIOSignal(signal_name, value ? SystemConstants::IOSignals::HIGH : SystemConstants::IOSignals::LOW);
+  try
+  {
+    rw::panel::setSpeedRatio(rws_client_, ratio);
+  }
+  catch (std::out_of_range const&)
+  {
+    return false;
+  }
+  return true;
 }
 
+bool RWSInterface::setDigitalSignal(std::string const& signal_name, bool value)
+{
+  try
+  {
+    setIOSignal(signal_name, value ? SystemConstants::IOSignals::HIGH : SystemConstants::IOSignals::LOW);
+  }
+  catch (const std::exception&)
+  {
+    return false;
+  }
+  return true;
+}
 
 void RWSInterface::setAnalogSignal(std::string const& signal_name, float value)
 {

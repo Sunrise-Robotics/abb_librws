@@ -135,41 +135,89 @@ EGMActions RWSStateMachineInterface::Services::EGM::getCurrentAction(const std::
   return result;
 }
 
-void RWSStateMachineInterface::Services::EGM::getSettings(const std::string& task, EGMSettings* p_settings) const
+bool RWSStateMachineInterface::Services::EGM::getSettings(const std::string& task, EGMSettings* p_settings) const
 {
-  p_rws_interface_->getRAPIDSymbolData({task, Symbols::EGM_SETTINGS}, *p_settings);
+  try{
+    p_rws_interface_->getRAPIDSymbolData({task, Symbols::EGM_SETTINGS}, *p_settings);
+  }
+  catch (const std::exception& e)
+  {
+    return false;
+  }
+  return true;
 }
 
-void RWSStateMachineInterface::Services::EGM::setSettings(const std::string& task, const EGMSettings& settings) const
+bool RWSStateMachineInterface::Services::EGM::setSettings(const std::string& task, const EGMSettings& settings) const
 {
-  p_rws_interface_->setRAPIDSymbolData({task, Symbols::EGM_SETTINGS}, settings);
+  try{
+    p_rws_interface_->setRAPIDSymbolData({task, Symbols::EGM_SETTINGS}, settings);
+  }
+  catch (const std::exception& e)
+  {
+    return false;
+  }
+  return true;
 }
 
-void RWSStateMachineInterface::Services::EGM::signalEGMStartJoint() const
+bool RWSStateMachineInterface::Services::EGM::signalEGMStartJoint() const
 {
-  p_rws_interface_->toggleIOSignal(IOSignals::EGM_START_JOINT);
+  try{
+    p_rws_interface_->toggleIOSignal(IOSignals::EGM_START_JOINT);
+  }
+  catch (const std::exception& e)
+  {
+    return false;
+  }
+  return true;
 }
 
-void RWSStateMachineInterface::Services::EGM::signalEGMStartPose() const
+bool RWSStateMachineInterface::Services::EGM::signalEGMStartPose() const
 {
-  p_rws_interface_->toggleIOSignal(IOSignals::EGM_START_POSE);
+  try{
+    p_rws_interface_->toggleIOSignal(IOSignals::EGM_START_POSE);
+  }
+  catch (const std::exception& e)
+  {
+    return false;
+  }
+  return true;
 }
 
-void RWSStateMachineInterface::Services::EGM::signalEGMStartStream() const
+bool RWSStateMachineInterface::Services::EGM::signalEGMStartStream() const
 {
-  p_rws_interface_->toggleIOSignal(IOSignals::EGM_START_STREAM);
+  try{
+    p_rws_interface_->toggleIOSignal(IOSignals::EGM_START_STREAM);
+  }
+  catch (const std::exception& e)
+  {
+    return false;
+  }
+  return true;
 }
 
-void RWSStateMachineInterface::Services::EGM::signalEGMStop() const
+bool RWSStateMachineInterface::Services::EGM::signalEGMStop() const
 {
-  p_rws_interface_->toggleIOSignal(IOSignals::EGM_STOP);
+  try{
+    p_rws_interface_->toggleIOSignal(IOSignals::EGM_STOP);
+  }
+  catch (const std::exception& e)
+  {
+    return false;
+  }
+  return true;
 }
 
-void RWSStateMachineInterface::Services::EGM::signalEGMStopStream() const
+bool RWSStateMachineInterface::Services::EGM::signalEGMStopStream() const
 {
-  p_rws_interface_->toggleIOSignal(IOSignals::EGM_STOP_STREAM);
+  try{
+    p_rws_interface_->toggleIOSignal(IOSignals::EGM_STOP_STREAM);
+  }
+  catch (const std::exception& e)
+  {
+    return false;
+  }
+  return true;
 }
-
 
 
 
@@ -288,16 +336,30 @@ void RWSStateMachineInterface::Services::RAPID::setMoveSpeed(const std::string& 
   p_rws_interface_->setRAPIDSymbolData({task, Symbols::RAPID_MOVE_SPEED_INPUT}, speed_data);
 }
 
-void RWSStateMachineInterface::Services::RAPID::setRoutineName(const std::string& task,
+bool RWSStateMachineInterface::Services::RAPID::setRoutineName(const std::string& task,
                                                                const std::string& routine_name) const
 {
-  RAPIDString temp_routine_name(routine_name);
-  p_rws_interface_->setRAPIDSymbolData({task, Symbols::RAPID_ROUTINE_NAME_INPUT}, temp_routine_name);
+  try{
+    RAPIDString temp_routine_name(routine_name);
+    p_rws_interface_->setRAPIDSymbolData({task, Symbols::RAPID_ROUTINE_NAME_INPUT}, temp_routine_name);
+  }
+  catch (const std::exception& e)
+  {
+    return false;
+  }
+  return true;
 }
 
-void RWSStateMachineInterface::Services::RAPID::signalRunRAPIDRoutine() const
+bool RWSStateMachineInterface::Services::RAPID::signalRunRAPIDRoutine() const
 {
-  p_rws_interface_->toggleIOSignal(IOSignals::RUN_RAPID_ROUTINE);
+  try{
+    p_rws_interface_->toggleIOSignal(IOSignals::RUN_RAPID_ROUTINE);
+  }
+  catch (const std::exception& e)
+  {
+    return false;
+  }
+  return true;
 }
 
 
@@ -622,9 +684,16 @@ void RWSStateMachineInterface::Services::SG::rightVacuum2On() const
   signalRunSGRoutine();
 }
 
-void RWSStateMachineInterface::Services::SG::signalRunSGRoutine() const
+bool RWSStateMachineInterface::Services::SG::signalRunSGRoutine() const
 {
-  p_rws_interface_->toggleIOSignal(IOSignals::RUN_SG_ROUTINE);
+  try{
+    p_rws_interface_->toggleIOSignal(IOSignals::RUN_SG_ROUTINE);
+  }
+  catch (const std::exception& e)
+  {
+    return false;
+  }
+  return true;
 }
 
 /************************************************************
